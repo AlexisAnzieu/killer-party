@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum GameStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  ENDED
+}
+
+model Game {
+  id        String   @id @default(cuid())
+  name      String?
+  status    GameStatus @default(NOT_STARTED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  players   Player[]
+  assassinations Assassination[]
+}
+
+model Player {
+  id         String   @id @default(cuid())
+  name       String
+  photoUrl   String
+  uniqueCode String
+  alive      Boolean  @default(true)
+  gameId     String
+  game       Game     @relation(fields: [gameId], references: [id])
+  targetId   String?
+  target     Player?  @relation("PlayerTarget", fields: [targetId], references: [id])
+  assignedTo Player[] @relation("PlayerTarget")
+  missionId  String
+  mission    Mission  @relation(fields: [missionId], references: [id])
+
+  kills      Assassination[] @relation("Killer")
+  deaths     Assassination[] @relation("Victim")
+}
+
+model Mission {
+  id          String   @id @default(cuid())
+  description String   @unique
+  players     Player[]
+}
+
+model Assassination {
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  killerId  String
+  killer    Player   @relation("Killer", fields: [killerId], references: [id])
+  victimId  String
+  victim    Player   @relation("Victim", fields: [victimId], references: [id])
+}
