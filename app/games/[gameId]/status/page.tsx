@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -94,7 +95,7 @@ export default function GameStatusPage() {
       <h2 className="text-2xl font-bold mb-4">🟢 Alive Players</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10 w-full max-w-4xl">
         {alivePlayers.map((p) => (
-          <div key={p.id} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:scale-105 transition-transform">
+          <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:scale-105 transition-transform">
             <p className="font-semibold">{p.name}</p>
             {p.photoUrl ? (
               <img src={p.photoUrl} alt="Player selfie" className="w-24 h-24 object-cover rounded-full border-2 border-green-300" />
@@ -103,14 +104,14 @@ export default function GameStatusPage() {
                 {p.name.charAt(0)}
               </div>
             )}
-          </div>
+          </Link>
         ))}
       </div>
 
       <h2 className="text-2xl font-bold mb-4">🔴 Eliminated Players</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl opacity-60">
         {eliminatedPlayers.map((p) => (
-          <div key={p.id} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow">
+          <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow">
             <p className="font-semibold">{p.name}</p>
             {p.photoUrl ? (
               <img src={p.photoUrl} alt="Player selfie" className="w-24 h-24 object-cover rounded-full border-2 border-red-300" />
@@ -119,7 +120,7 @@ export default function GameStatusPage() {
                 {p.name.charAt(0)}
               </div>
             )}
-          </div>
+          </Link>
         ))}
       </div>
     </div>

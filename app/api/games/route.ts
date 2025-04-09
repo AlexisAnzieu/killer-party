@@ -19,11 +19,17 @@ export async function POST(req: NextRequest) {
 
     const playersData = playerNames.map((playerName) => {
       const randomMission = missions[Math.floor(Math.random() * missions.length)];
-      const uniqueCode = Array.from({ length: 6 }, () =>
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(Math.floor(Math.random() * 36))
+
+      // Clean the player name: remove special characters but keep letters, numbers, and spaces
+      const cleanedName = playerName.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+
+      // Generate a 3-letter uppercase code
+      const uniqueCode = Array.from({ length: 3 }, () =>
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26))
       ).join("");
+
       return {
-        name: playerName,
+        name: cleanedName,
         photoUrl: "",
         uniqueCode,
         missionId: randomMission.id,
