@@ -45,39 +45,50 @@ export default function PlayerLoginPage() {
       body: JSON.stringify({ photoUrl }),
     });
 
-    setMessage("Selfie uploaded successfully!");
+    setMessage("🎉 Selfie uploaded successfully!");
     router.push(`/games/${gameId}/player/${selectedPlayerId}`);
   };
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Player Login & Selfie Upload</h1>
-      <select
-        aria-label="Select your player name"
-        value={selectedPlayerId}
-        onChange={(e) => setSelectedPlayerId(e.target.value)}
-        className="border p-2 mb-4 w-full"
-      >
-        <option value="">Select your name</option>
-        {players.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="selfie-upload" className="block mb-1 font-medium">Upload your selfie</label>
-      <input
-        id="selfie-upload"
-        type="file"
-        accept="image/*"
-        title="Upload your selfie"
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        className="mb-4 w-full"
-      />
-      <button onClick={uploadSelfie} className="bg-green-500 text-white px-4 py-2 rounded">
-        Upload Selfie
-      </button>
-      {message && <p className="mt-2">{message}</p>}
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-br from-indigo-700 via-purple-500 to-pink-400 text-white animate-fade-in">
+      <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-glow animate-pulse text-center">
+        Player Login & Selfie Upload
+      </h1>
+      <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-3xl p-8 w-full max-w-xl shadow-lg flex flex-col gap-6">
+        <select
+          aria-label="Select your player name"
+          value={selectedPlayerId}
+          onChange={(e) => setSelectedPlayerId(e.target.value)}
+          className="p-3 rounded-full text-black font-semibold shadow hover:scale-105 transition-transform"
+        >
+          <option value="">🎭 Select your name</option>
+          {players.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+        <div>
+          <label htmlFor="selfie-upload" className="block mb-2 font-semibold text-lg">📸 Upload your selfie</label>
+          <input
+            id="selfie-upload"
+            type="file"
+            accept="image/*"
+            title="Upload your selfie"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            className="w-full p-3 rounded-full text-black font-semibold shadow hover:scale-105 transition-transform"
+          />
+        </div>
+        <button
+          onClick={uploadSelfie}
+          className="bg-yellow-300 text-purple-800 font-bold px-6 py-3 rounded-full shadow-lg hover:scale-110 hover:bg-yellow-400 transition-transform duration-300 ease-out animate-bounce"
+        >
+          🚀 Upload Selfie
+        </button>
+        {message && (
+          <p className="text-green-300 font-bold text-center animate-pulse">{message}</p>
+        )}
+      </div>
     </div>
   );
 }

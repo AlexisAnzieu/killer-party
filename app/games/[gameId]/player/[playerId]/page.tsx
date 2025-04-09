@@ -47,19 +47,17 @@ export default function PlayerDashboard() {
       const uploadData = await uploadRes.json();
       const photoUrl = uploadData.url;
 
-      // Update player with selfie URL
       await fetch(`/api/players/${playerId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ photoUrl }),
       });
 
-      // Trigger target assignment
       await fetch(`/api/games/${gameId}/assign`, { method: "POST" });
-      setMessage("Selfie uploaded and targets assigned!");
+      setMessage("🎉 Selfie uploaded and targets assigned!");
     } catch (error) {
       console.error(error);
-      setMessage("Upload failed");
+      setMessage("❌ Upload failed");
     } finally {
       setUploading(false);
     }
@@ -73,67 +71,82 @@ export default function PlayerDashboard() {
     });
     const data = await res.json();
     if (res.ok) {
-      setMessage("Assassination confirmed!");
+      setMessage("✅ Assassination confirmed!");
     } else {
-      setMessage(data.error || "Failed to confirm assassination");
+      setMessage(`❌ ${data.error || "Failed to confirm assassination"}`);
     }
   };
 
-  if (!player) return <div>Loading...</div>;
+  if (!player) return <div className="text-center text-white">Loading...</div>;
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Player Dashboard</h1>
-      <p className="mb-2"><strong>Your Name:</strong> {player.name}</p>
-      <p className="mb-2"><strong>Your Secret Code:</strong> {player.uniqueCode}</p>
-      <p className="mb-2"><strong>Your Mission:</strong> {player.mission?.description}</p>
-      {target && (
-        <>
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">Upload Your Selfie</h2>
-            <input
-              type="file"
-              accept="image/*"
-              aria-label="Upload your selfie"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="mb-2"
-            />
-            <button
-              onClick={handleUpload}
-              disabled={uploading || !file}
-              className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-            >
-              {uploading ? "Uploading..." : "Upload Selfie"}
-            </button>
-          </div>
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">Your Target</h2>
-            <p><strong>Name:</strong> {target.name}</p>
-            {target.photoUrl ? (
-              <img
-                src={target.photoUrl}
-                alt="Target selfie"
-                className="w-32 h-32 object-cover rounded-full mb-2"
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-br from-purple-800 via-pink-600 to-yellow-400 text-white animate-fade-in">
+      <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-glow animate-pulse text-center">
+        Player Dashboard
+      </h1>
+      <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-3xl p-8 w-full max-w-2xl shadow-lg flex flex-col gap-6">
+        <div className="flex flex-col gap-2 text-lg font-semibold">
+          <p>🧑 <span className="text-yellow-300">Your Name:</span> {player.name}</p>
+          <p>🕵️ <span className="text-green-300">Secret Code:</span> {player.uniqueCode}</p>
+          <p>🎯 <span className="text-pink-300">Mission:</span> {player.mission?.description}</p>
+        </div>
+
+        {target && (
+          <>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl font-bold">📸 Upload Your Selfie</h2>
+              <input
+                type="file"
+                accept="image/*"
+                aria-label="Upload your selfie"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="p-3 rounded-full text-black font-semibold shadow hover:scale-105 transition-transform"
               />
-            ) : (
-              <p>No selfie uploaded yet.</p>
-            )}
-          </div>
-        </>
-      )}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Victim's secret code"
-          value={victimCode}
-          onChange={(e) => setVictimCode(e.target.value)}
-          className="border p-2 w-full mb-2"
-        />
-        <button onClick={confirmKill} className="bg-red-500 text-white px-4 py-2 rounded">
-          Confirm Kill
-        </button>
+              <button
+                onClick={handleUpload}
+                disabled={uploading || !file}
+                className="bg-yellow-300 text-purple-800 font-bold px-6 py-3 rounded-full shadow-lg hover:scale-110 hover:bg-yellow-400 transition-transform duration-300 ease-out animate-bounce disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploading ? "Uploading..." : "🚀 Upload Selfie"}
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-2 mt-6">
+              <h2 className="text-2xl font-bold">🎯 Your Target</h2>
+              <p className="font-semibold">{target.name}</p>
+              {target.photoUrl ? (
+                <img
+                  src={target.photoUrl}
+                  alt="Target selfie"
+                  className="w-32 h-32 object-cover rounded-full border-4 border-yellow-300 mx-auto"
+                />
+              ) : (
+                <p>No selfie uploaded yet.</p>
+              )}
+            </div>
+          </>
+        )}
+
+        <div className="flex flex-col gap-4 mt-6">
+          <input
+            type="text"
+            placeholder="Enter victim's secret code"
+            value={victimCode}
+            onChange={(e) => setVictimCode(e.target.value)}
+            className="p-3 rounded-full text-black font-semibold shadow hover:scale-105 transition-transform"
+          />
+          <button
+            onClick={confirmKill}
+            className="bg-red-500 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:scale-110 hover:bg-red-600 transition-transform duration-300 ease-out"
+          >
+            ☠️ Confirm Kill
+          </button>
+        </div>
+
+        {message && (
+          <p className="text-center font-bold mt-4 animate-pulse">{message}</p>
+        )}
       </div>
-      {message && <p className="mt-2">{message}</p>}
     </div>
   );
 }

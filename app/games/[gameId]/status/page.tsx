@@ -31,44 +31,48 @@ export default function GameStatusPage() {
   }, [gameId]);
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Game Status</h1>
-      <p className="mb-4">Status: <strong>{status}</strong></p>
+    <div className="min-h-screen flex flex-col items-center justify-start px-6 py-12 bg-gradient-to-br from-indigo-800 via-purple-600 to-pink-400 text-white animate-fade-in">
+      <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-glow animate-pulse text-center">
+        🎮 Game Status
+      </h1>
+      <p className="mb-6 text-xl font-semibold">Status: <span className="text-yellow-300">{status}</span></p>
 
       {winner && (
-        <div className="mb-6 p-4 border rounded bg-green-100">
-          <h2 className="text-xl font-semibold mb-2">Winner!</h2>
-          <p>{winner.name}</p>
-          <img src={winner.photoUrl ?? undefined} alt="Winner selfie" className="w-32 h-32 object-cover rounded-full" />
+        <div className="mb-10 p-6 rounded-3xl bg-green-500 bg-opacity-30 backdrop-blur-md shadow-lg flex flex-col items-center gap-4">
+          <h2 className="text-3xl font-bold animate-pulse">🏆 Winner!</h2>
+          <p className="text-xl font-semibold">{winner.name}</p>
+          {winner.photoUrl && (
+            <img src={winner.photoUrl} alt="Winner selfie" className="w-32 h-32 object-cover rounded-full border-4 border-yellow-300" />
+          )}
         </div>
       )}
 
-      <h2 className="text-xl font-semibold mb-2">Alive Players</h2>
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <h2 className="text-2xl font-bold mb-4">🟢 Alive Players</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10 w-full max-w-4xl">
         {alivePlayers.map((p) => (
-          <div key={p.id} className="border p-2 rounded text-center">
-            <p>{p.name}</p>
+          <div key={p.id} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:scale-105 transition-transform">
+            <p className="font-semibold">{p.name}</p>
             {p.photoUrl ? (
-              <img src={p.photoUrl ?? undefined} alt="Player selfie" className="w-24 h-24 object-cover rounded-full mx-auto" />
+              <img src={p.photoUrl} alt="Player selfie" className="w-24 h-24 object-cover rounded-full border-2 border-green-300" />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center mx-auto">
-                <span className="text-gray-600">{p.name.charAt(0)}</span>
+              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-black font-bold">
+                {p.name.charAt(0)}
               </div>
             )}
           </div>
         ))}
       </div>
 
-      <h2 className="text-xl font-semibold mb-2">Eliminated Players</h2>
-      <div className="grid grid-cols-2 gap-4">
+      <h2 className="text-2xl font-bold mb-4">🔴 Eliminated Players</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl opacity-60">
         {eliminatedPlayers.map((p) => (
-          <div key={p.id} className="border p-2 rounded text-center opacity-50">
-            <p>{p.name}</p>
+          <div key={p.id} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow">
+            <p className="font-semibold">{p.name}</p>
             {p.photoUrl ? (
-              <img src={p.photoUrl ?? undefined} alt="Player selfie" className="w-24 h-24 object-cover rounded-full mx-auto" />
+              <img src={p.photoUrl} alt="Player selfie" className="w-24 h-24 object-cover rounded-full border-2 border-red-300" />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center mx-auto">
-                <span className="text-gray-600">{p.name.charAt(0)}</span>
+              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-black font-bold">
+                {p.name.charAt(0)}
               </div>
             )}
           </div>
