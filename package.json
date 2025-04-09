@@ -4,9 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:reset": "dotenv -e .env.local -- npx prisma migrate reset --force",
+    "prisma:generate": "dotenv -e .env.local --  npx prisma generate",
+    "prisma:migrate": "dotenv -e .env.local --  npx prisma migrate dev",
+    "prisma:studio": "dotenv -e .env.local -- npx prisma studio",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
@@ -21,10 +26,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.2.5",
     "prisma": "^6.6.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"}   prisma/seed.ts"
   }
 }
