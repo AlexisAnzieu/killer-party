@@ -17,12 +17,14 @@ export default function GameStatusPage() {
   const [alivePlayers, setAlivePlayers] = useState<Player[]>([]);
   const [eliminatedPlayers, setEliminatedPlayers] = useState<Player[]>([]);
   const [winner, setWinner] = useState<Player | null>(null);
+  const [newStatus, setNewStatus] = useState<string>("");
 
   useEffect(() => {
     const fetchStatus = async () => {
       const res = await fetch(`/api/games/${gameId}/status`);
       const data = await res.json();
       setStatus(data.status);
+      setNewStatus(data.status);
       setAlivePlayers(data.alivePlayers);
       setEliminatedPlayers(data.eliminatedPlayers);
       setWinner(data.winner);
@@ -30,12 +32,54 @@ export default function GameStatusPage() {
     fetchStatus();
   }, [gameId]);
 
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setNewStatus(e.target.value);
+  };
+
+  const updateStatus = async () => {
+    try {
+      const res = await fetch(`/api/games/${gameId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStatus(data.status);
+      } else {
+        console.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-start px-6 py-12 bg-gradient-to-br from-indigo-800 via-purple-600 to-pink-400 text-white animate-fade-in">
       <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-glow animate-pulse text-center">
         🎮 Game Status
       </h1>
       <p className="mb-6 text-xl font-semibold">Status: <span className="text-yellow-300">{status}</span></p>
+
+      <div className="mb-6 flex flex-col items-center gap-4">
+        <label htmlFor="status-select" className="sr-only">Change Game Status</label>
+        <select
+          id="status-select"
+          value={newStatus}
+          onChange={handleStatusChange}
+          className="text-black p-2 rounded"
+        >
+          <option value="NOT_STARTED">NOT_STARTED</option>
+          <option value="IN_PROGRESS">IN_PROGRESS</option>
+          <option value="ENDED">ENDED</option>
+        </select>
+        <button
+          onClick={updateStatus}
+          className="px-4 py-2 bg-yellow-400 text-black rounded hover:bg-yellow-300 transition"
+        >
+          Update Status
+        </button>
+      </div>
 
       {winner && (
         <div className="mb-10 p-6 rounded-3xl bg-green-500 bg-opacity-30 backdrop-blur-md shadow-lg flex flex-col items-center gap-4">

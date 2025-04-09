@@ -7,7 +7,7 @@ export default function NewGamePage() {
   const router = useRouter();
   const [gameName, setGameName] = useState("");
   const [playersText, setPlayersText] = useState("");
-  const [gameId, setGameId] = useState<string | null>(null);
+  const [, setGameId] = useState<string | null>(null);
 
   const createGame = async () => {
     const playerNames = playersText
