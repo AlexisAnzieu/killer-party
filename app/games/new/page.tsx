@@ -62,7 +62,7 @@ export default function NewGamePage() {
           className="w-full p-3 sm:p-4 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.3)] hover:shadow-[0_0_20px_rgba(0,255,231,0.5)] hover:scale-105 transition-all duration-300 text-sm sm:text-base placeholder:text-[#00ffe7]/50"
         />
         <div className="space-y-2 sm:space-y-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#ff4ecd] glow-text px-2">👥 Ajouter des Joueurs</h2>
+          <h2 className="text-md sm:text-xl font-bold text-[#ff4ecd] glow-text px-2">👥 Ajouter des Joueurs (un nom par ligne)</h2>
           <textarea
             placeholder="Entrez un nom de joueur par ligne"
             value={playersText}
@@ -80,7 +80,7 @@ export default function NewGamePage() {
           disabled={isLoading}
           className="w-full px-6 py-4 bg-[#ff4ecd] text-white font-bold rounded-full shadow-[0_0_15px_rgba(255,78,205,0.4)] hover:shadow-[0_0_30px_rgba(255,78,205,0.6)] hover:scale-105 transition-all duration-300 text-base sm:text-lg mt-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          {isLoading ? "⏳ Création en cours..." : "🚀 Créer la Partie & Ajouter les Joueurs"}
+          {isLoading ? "⏳ Création en cours..." : "🚀 Créer la Partie"}
         </button>
       </div>
     </div>
