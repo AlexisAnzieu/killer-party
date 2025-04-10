@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Player {
   id: string;
@@ -18,10 +19,38 @@ export default function PlayerLoginPage() {
   const [searchText, setSearchText] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Add ref for the autocomplete container
   const autocompleteRef = useRef<HTMLDivElement>(null);
+
+  // Handle file selection and create preview
+  const handleFileSelect = (file: File | null) => {
+    setFile(file);
+    
+    // Clear previous preview
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    
+    // Create new preview
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+    }
+  };
+
+  useEffect(() => {
+    // Cleanup function to revoke preview URLs when component unmounts
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   useEffect(() => {
     // Click outside handler
@@ -65,23 +94,33 @@ export default function PlayerLoginPage() {
   const uploadSelfie = async () => {
     if (!file || !selectedPlayerId) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    const photoUrl = data.url;
+    setIsLoading(true);
+    setMessage("");
+    
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      const photoUrl = data.url;
 
-    await fetch(`/api/players/${selectedPlayerId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ photoUrl }),
-    });
+      await fetch(`/api/players/${selectedPlayerId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photoUrl }),
+      });
 
-    setMessage("🎉 Selfie envoyé avec succès !");
-    router.push(`/games/${gameId}/player/${selectedPlayerId}`);
+      setMessage("🎉 Selfie envoyé avec succès !");
+      router.push(`/games/${gameId}/player/${selectedPlayerId}`);
+    } catch (error) {
+      console.error("Error uploading selfie:", error);
+      setMessage("❌ Erreur lors de l'envoi du selfie. Veuillez réessayer.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -122,40 +161,65 @@ export default function PlayerLoginPage() {
             <div>
               <label
                 htmlFor="selfie-upload"
-                className="block mb-2 font-semibold text-lg text-[#ff4ecd] glow-text"
+                className="block mb-2 font-semibold text-lg text-[#ff4ecd] glow-text text-center"
               >
-                📸 Vérification par selfie
+                Vérification d&apos;identité
               </label>
               <label
                 htmlFor="selfie-upload"
                 className="flex items-center justify-center w-full p-3 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#7a5fff] shadow-[0_0_10px_rgba(122,95,255,0.3)] hover:shadow-[0_0_20px_rgba(122,95,255,0.5)] hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                📷 Envoyer photo
+                📷 Envoyer un selfie
                 <input
                   id="selfie-upload"
                   type="file"
                   accept="image/*"
                   title="Envoyez votre selfie"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
                   className="hidden"
                 />
               </label>
               {file && (
                 <p className="mt-2 text-center text-[#00ffe7]">
-                  Photo sélectionnée: {file.name}
+                  Photo sélectionnée:
                 </p>
               )}
             </div>
+
+            {previewUrl && (
+              <div className="flex justify-center mt-2">
+                <div className="relative w-48 h-48 rounded-lg overflow-hidden border-2 border-[#00ffe7]">
+                  <Image 
+                    src={previewUrl} 
+                    alt="Aperçu du selfie" 
+                    fill 
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+            )}
+
             <button
               onClick={uploadSelfie}
-              disabled={!file}
+              disabled={!file || isLoading}
               className={`font-bold px-6 py-3 rounded-full transition-all duration-300 ${
-                file
+                file && !isLoading
                   ? "bg-[#ff4ecd] text-white shadow-[0_0_15px_rgba(255,78,205,0.4)] hover:shadow-[0_0_30px_rgba(255,78,205,0.6)] hover:scale-110"
                   : "bg-gray-500 text-gray-300 cursor-not-allowed"
-              }`}
+              } flex items-center justify-center`}
             >
-              🚀 S&apos;authentifier
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Envoi en cours...
+                </>
+              ) : (
+                "🚀 S'authentifier"
+              )}
             </button>
           </>
         )}
