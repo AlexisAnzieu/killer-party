@@ -58,11 +58,30 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ga
       // Shuffle missions
       const shuffledMissions = missions.sort(() => Math.random() - 0.5);
 
+      // Create a set to track used mission IDs to ensure uniqueness
+      const usedMissionIds = new Set<string>();
+
       // Assign targets and missions
       for (let i = 0; i < shuffledPlayers.length; i++) {
         const killer = shuffledPlayers[i];
         const target = shuffledPlayers[(i + 1) % shuffledPlayers.length];
-        const mission = shuffledMissions[i];
+        
+        // Find an unused mission
+        let missionIndex = i;
+        while (usedMissionIds.has(shuffledMissions[missionIndex].id)) {
+          missionIndex = (missionIndex + 1) % shuffledMissions.length;
+          // Safety check: if we've gone through all missions and found none available
+          // (shouldn't happen due to our earlier check, but just to be safe)
+          if (missionIndex === i) {
+            return NextResponse.json(
+              { error: 'Could not assign unique missions to all players' },
+              { status: 400 }
+            );
+          }
+        }
+        
+        const mission = shuffledMissions[missionIndex];
+        usedMissionIds.add(mission.id);
 
         await prisma.player.update({
           where: { id: killer.id },
