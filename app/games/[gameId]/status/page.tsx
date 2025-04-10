@@ -56,51 +56,51 @@ export default function GameStatusPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start px-6 py-12 bg-gradient-to-br from-indigo-800 via-purple-600 to-pink-400 text-white animate-fade-in">
-      <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-glow animate-pulse text-center">
-        🎮 Game Status
+    <div className="min-h-screen flex flex-col items-center justify-start px-4 sm:px-6 py-8 sm:py-12 bg-gradient-to-br from-[#0d0221] via-[#ff4ecd] to-[#00ffe7] bg-opacity-20 text-white">
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-center glow-text">
+        🎮 État de la Partie
       </h1>
-      <p className="mb-6 text-xl font-semibold">Status: <span className="text-yellow-300">{status}</span></p>
+      <p className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold">Statut: <span className="text-[#00ffe7] glow-cyan">{status}</span></p>
 
-      <div className="mb-6 flex flex-col items-center gap-4">
-        <label htmlFor="status-select" className="sr-only">Change Game Status</label>
+      <div className="mb-4 sm:mb-6 flex flex-col items-center gap-3 sm:gap-4 w-full max-w-xs">
+        <label htmlFor="status-select" className="sr-only">Changer le Statut du Jeu</label>
         <select
           id="status-select"
           value={newStatus}
           onChange={handleStatusChange}
-          className="text-black p-2 rounded"
+          className="w-full p-3 sm:p-4 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.3)] hover:shadow-[0_0_20px_rgba(0,255,231,0.5)] hover:scale-105 transition-all duration-300"
         >
-          <option value="NOT_STARTED">NOT_STARTED</option>
-          <option value="IN_PROGRESS">IN_PROGRESS</option>
-          <option value="ENDED">ENDED</option>
+          <option value="NOT_STARTED">NON COMMENCÉ</option>
+          <option value="IN_PROGRESS">EN COURS</option>
+          <option value="ENDED">TERMINÉ</option>
         </select>
         <button
           onClick={updateStatus}
-          className="px-4 py-2 bg-yellow-400 text-black rounded hover:bg-yellow-300 transition"
+          className="w-full px-6 py-4 bg-[#ff4ecd] text-white font-bold rounded-full shadow-[0_0_15px_rgba(255,78,205,0.4)] hover:shadow-[0_0_30px_rgba(255,78,205,0.6)] hover:scale-105 transition-all duration-300 text-base sm:text-lg"
         >
-          Update Status
+          Mettre à Jour le Statut
         </button>
       </div>
 
       {winner && (
-        <div className="mb-10 p-6 rounded-3xl bg-green-500 bg-opacity-30 backdrop-blur-md shadow-lg flex flex-col items-center gap-4">
-          <h2 className="text-3xl font-bold animate-pulse">🏆 Winner!</h2>
-          <p className="text-xl font-semibold">{winner.name}</p>
+        <div className="mb-6 sm:mb-10 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-black bg-opacity-50 backdrop-blur-md border border-[#ff4ecd] shadow-[0_0_30px_rgba(255,78,205,0.4)] flex flex-col items-center gap-3 sm:gap-4 w-full max-w-sm mx-4">
+          <h2 className="text-2xl sm:text-3xl font-bold glow-text animate-pulse">🏆 Gagnant !</h2>
+          <p className="text-lg sm:text-xl font-semibold text-[#00ffe7] glow-cyan">{winner.name}</p>
           {winner.photoUrl && (
-            <img src={winner.photoUrl} alt="Winner selfie" className="w-32 h-32 object-cover rounded-full border-4 border-yellow-300" />
+            <img src={winner.photoUrl} alt="Selfie du gagnant" className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full border-4 border-[#ff4ecd] shadow-[0_0_20px_rgba(255,78,205,0.5)]" />
           )}
         </div>
       )}
 
-      <h2 className="text-2xl font-bold mb-4">🟢 Alive Players</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10 w-full max-w-4xl">
+      <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-green-700 ">🟢 Joueurs en Vie</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-10 w-full max-w-4xl px-2 sm:px-4">
         {alivePlayers.map((p) => (
-          <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow hover:scale-105 transition-transform">
-            <p className="font-semibold">{p.name}</p>
+          <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.2)] hover:shadow-[0_0_20px_rgba(0,255,231,0.4)] hover:scale-105 transition-all duration-300">
+            <p className="font-semibold text-[#00ffe7] text-sm sm:text-base truncate w-full text-center">{p.name}</p>
             {p.photoUrl ? (
-              <img src={p.photoUrl} alt="Player selfie" className="w-24 h-24 object-cover rounded-full border-2 border-green-300" />
+              <img src={p.photoUrl} alt="Selfie du joueur" className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.3)]" />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-black font-bold">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0d0221] border-2 border-[#00ffe7] flex items-center justify-center text-[#00ffe7] font-bold shadow-[0_0_10px_rgba(0,255,231,0.3)]">
                 {p.name.charAt(0)}
               </div>
             )}
@@ -108,15 +108,15 @@ export default function GameStatusPage() {
         ))}
       </div>
 
-      <h2 className="text-2xl font-bold mb-4">🔴 Eliminated Players</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl opacity-60">
+      <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-red-500 ">🔴 Joueurs Éliminés</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full max-w-4xl px-2 sm:px-4 opacity-60">
         {eliminatedPlayers.map((p) => (
-          <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center gap-2 shadow">
-            <p className="font-semibold">{p.name}</p>
+          <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.2)]">
+            <p className="font-semibold text-[#ff4ecd] text-sm sm:text-base truncate w-full text-center">{p.name}</p>
             {p.photoUrl ? (
-              <img src={p.photoUrl} alt="Player selfie" className="w-24 h-24 object-cover rounded-full border-2 border-red-300" />
+              <img src={p.photoUrl} alt="Selfie du joueur" className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.3)]" />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-black font-bold">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0d0221] border-2 border-[#ff4ecd] flex items-center justify-center text-[#ff4ecd] font-bold shadow-[0_0_10px_rgba(255,78,205,0.3)]">
                 {p.name.charAt(0)}
               </div>
             )}

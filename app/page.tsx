@@ -7,13 +7,13 @@ export default function Home() {
         Killer Party
       </h1>
       <p className="text-2xl mb-8 max-w-3xl font-medium">
-        The ultimate social game of <span className="text-yellow-300 font-bold">strategy</span>, <span className="text-green-300 font-bold">stealth</span>, and <span className="text-pink-300 font-bold">surprise</span>. Gather your friends, assign secret targets, and see who will be the last one standing!
+        Le jeu social ultime de <span className="text-yellow-300 font-bold">stratégie</span>, <span className="text-green-300 font-bold">discrétion</span>, et de <span className="text-pink-300 font-bold">surprise</span>. Rassemblez vos amis, assignez des cibles secrètes, et voyez qui sera le dernier survivant !
       </p>
       <Link
         href="/games/new"
         className="inline-block bg-yellow-300 text-purple-800 font-bold px-8 py-4 rounded-full shadow-lg hover:scale-110 hover:bg-yellow-400 transition-transform duration-300 ease-out animate-bounce"
       >
-        🎮 Start a New Game
+        🎮 Démarrer une Nouvelle Partie
       </Link>
     </div>
   );

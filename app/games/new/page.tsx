@@ -7,6 +7,7 @@ export default function NewGamePage() {
   const router = useRouter();
   const [gameName, setGameName] = useState("");
   const [playersText, setPlayersText] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [, setGameId] = useState<string | null>(null);
 
   const createGame = async () => {
@@ -15,43 +16,60 @@ export default function NewGamePage() {
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
 
+    if (playerNames.length < 2) {
+      setError("Il faut au moins 2 joueurs pour créer une partie");
+      return;
+    }
+
+    setError(null);
     const res = await fetch("/api/games", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: gameName, playerNames }),
     });
     const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error || "Une erreur est survenue");
+      return;
+    }
+
     setGameId(data.gameId);
     router.push(`/games/${data.gameId}/status`);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-br from-pink-500 via-yellow-400 to-green-400 text-white animate-fade-in">
-      <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-glow animate-pulse text-center">
-        🎲 Create New Killer Game
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12 bg-gradient-to-br from-[#0d0221] via-[#ff4ecd] to-[#00ffe7] bg-opacity-20 text-white">
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-center ">
+        🎲 Créer une Nouvelle Partie
       </h1>
-      <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-3xl p-8 w-full max-w-2xl shadow-lg flex flex-col gap-6">
+      <div className="bg-black bg-opacity-50 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-8 w-full max-w-2xl mx-4 border border-[#ff4ecd] shadow-[0_0_15px_rgba(255,78,205,0.3)] flex flex-col gap-4 sm:gap-6">
         <input
           type="text"
-          placeholder="Game name (optional)"
+          placeholder="Nom de la partie (optionnel)"
           value={gameName}
           onChange={(e) => setGameName(e.target.value)}
-          className="p-3 rounded-full text-black font-semibold shadow hover:scale-105 transition-transform"
+          className="w-full p-3 sm:p-4 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.3)] hover:shadow-[0_0_20px_rgba(0,255,231,0.5)] hover:scale-105 transition-all duration-300 text-sm sm:text-base placeholder:text-[#00ffe7]/50"
         />
-        <div>
-          <h2 className="text-2xl font-bold mb-2">👥 Add Players</h2>
+        <div className="space-y-2 sm:space-y-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#ff4ecd] glow-text px-2">👥 Ajouter des Joueurs</h2>
           <textarea
-            placeholder="Enter one player name per line"
+            placeholder="Entrez un nom de joueur par ligne"
             value={playersText}
             onChange={(e) => setPlayersText(e.target.value)}
-            className="p-3 rounded-3xl text-black font-semibold shadow hover:scale-105 transition-transform w-full h-40"
+            className="w-full p-4 sm:p-6 rounded-2xl bg-black text-[#00ffe7] font-semibold border border-[#7a5fff] shadow-[0_0_10px_rgba(122,95,255,0.3)] hover:shadow-[0_0_20px_rgba(122,95,255,0.5)] hover:scale-105 transition-all duration-300 h-48 sm:h-56 resize-none text-sm sm:text-base placeholder:text-[#00ffe7]/50"
           />
         </div>
+        {error && (
+          <div className="text-red-500  text-sm font-medium bg-red-100/10 p-3 rounded-lg border border-red-500/50">
+            ⚠️ {error}
+          </div>
+        )}
         <button
           onClick={createGame}
-          className="bg-yellow-300 text-purple-800 font-bold px-6 py-3 rounded-full shadow-lg hover:scale-110 hover:bg-yellow-400 transition-transform duration-300 ease-out animate-bounce"
+          className="w-full px-6 py-4 bg-[#ff4ecd] text-white font-bold rounded-full shadow-[0_0_15px_rgba(255,78,205,0.4)] hover:shadow-[0_0_30px_rgba(255,78,205,0.6)] hover:scale-105 transition-all duration-300 text-base sm:text-lg mt-2"
         >
-          🚀 Create Game & Add Players
+          🚀 Créer la Partie & Ajouter les Joueurs
         </button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, GameStatus } from '@prisma/client';
+import { GameStatus } from '@prisma/client';
+import prisma from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
   try {

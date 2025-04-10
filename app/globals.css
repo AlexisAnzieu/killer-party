@@ -1,26 +1,49 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d0221; /* deep purple synthwave background */
+  --foreground: #f8f8f8; /* light text */
+  --accent-pink: #ff4ecd; /* neon pink */
+  --accent-cyan: #00ffe7; /* neon cyan */
+  --accent-purple: #7a5fff; /* neon purple */
+  --glow-color: #ff4ecd; /* default glow color */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Orbitron', sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #f8f8f8;
+    --glow-color: #00ffe7;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color);
+}
+
+/* Optional: utility classes for synthwave glow effects */
+.glow-text {
+  color: var(--accent-pink);
+  text-shadow: 0 0 5px var(--accent-pink), 0 0 10px var(--accent-pink), 0 0 20px var(--accent-pink);
+}
+
+.glow-cyan {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 5px var(--accent-cyan), 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-cyan);
+}
+
+.glow-purple {
+  color: var(--accent-purple);
+  text-shadow: 0 0 5px var(--accent-purple), 0 0 10px var(--accent-purple), 0 0 20px var(--accent-purple);
 }
