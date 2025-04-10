@@ -22,9 +22,17 @@ export default function PlayerLoginPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Add ref for the autocomplete container
   const autocompleteRef = useRef<HTMLDivElement>(null);
+
+  // Function to check if the device is mobile
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  };
 
   // Handle file selection and create preview
   const handleFileSelect = (file: File | null) => {
@@ -41,6 +49,17 @@ export default function PlayerLoginPage() {
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
     }
+  };
+
+  // Function to open camera with front camera as default for mobile
+  const openCamera = () => {
+    if (fileInputRef.current && isMobileDevice()) {
+      // Set attributes for front camera on mobile devices
+      fileInputRef.current.setAttribute("capture", "user");
+    }
+    
+    // Trigger the file input click
+    fileInputRef.current?.click();
   };
 
   useEffect(() => {
@@ -165,20 +184,21 @@ export default function PlayerLoginPage() {
               >
                 Vérification d&apos;identité
               </label>
-              <label
-                htmlFor="selfie-upload"
+              <button
+                onClick={openCamera}
                 className="flex items-center justify-center w-full p-3 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#7a5fff] shadow-[0_0_10px_rgba(122,95,255,0.3)] hover:shadow-[0_0_20px_rgba(122,95,255,0.5)] hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 📷 Envoyer un selfie
-                <input
-                  id="selfie-upload"
-                  type="file"
-                  accept="image/*"
-                  title="Envoyez votre selfie"
-                  onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
-                  className="hidden"
-                />
-              </label>
+              </button>
+              <input
+                ref={fileInputRef}
+                id="selfie-upload"
+                type="file"
+                accept="image/*"
+                title="Envoyez votre selfie"
+                onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
+                className="hidden"
+              />
               {file && (
                 <p className="mt-2 text-center text-[#00ffe7]">
                   Photo sélectionnée:
