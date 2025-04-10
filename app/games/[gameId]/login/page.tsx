@@ -118,6 +118,7 @@ export default function PlayerLoginPage() {
     
     try {
       const formData = new FormData();
+      formData.append("gameId", gameId);  
       formData.append("file", file);
       const res = await fetch("/api/upload", {
         method: "POST",

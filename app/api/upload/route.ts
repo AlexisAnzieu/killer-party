@@ -13,16 +13,17 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
+    const gameId = formData.get('gameId') as string | null;
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    if (!file || !gameId) {
+      return NextResponse.json({ error: 'No file or gameId provided' }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ folder: 'killer-game' }, (error, result) => {
+      cloudinary.uploader.upload_stream({ folder: `killer-game/${gameId}` }, (error, result) => {
         if (error || !result) return reject(error || new Error('Upload failed'));
         resolve(result);
       }).end(buffer);

@@ -5,13 +5,24 @@ export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const victimId = url.searchParams.get('victimId');
+    const killerId = url.searchParams.get('killerId');
     
-    if (!victimId) {
-      return NextResponse.json({ error: 'Missing victimId parameter' }, { status: 400 });
+    if (!victimId && !killerId) {
+      return NextResponse.json({ error: 'Missing victimId or killerId parameter' }, { status: 400 });
     }
     
+    const where = victimId 
+      ? { victimId } 
+      : killerId 
+      ? { killerId }
+      : undefined;
+
+    if (!where) {
+      return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
+    }
+
     const assassinations = await prisma.assassination.findMany({
-      where: { victimId },
+      where,
       include: {
         killer: true,
         victim: true,

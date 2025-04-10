@@ -18,41 +18,48 @@ export default function PlayerDashboard() {
   const [victimCode, setVictimCode] = useState("");
   const [message, setMessage] = useState("");
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
+  const [assassinationCount, setAssassinationCount] = useState<number>(0);
 
-  useEffect(() => {
-    const fetchPlayer = async () => {
-      const res = await fetch(`/api/players/${playerId}`);
-      const data = await res.json();
-      setPlayer(data);
-      
-      // If player is alive and has a target, fetch target info
-      if (data.alive && data.targetId) {
-        const targetRes = await fetch(`/api/players/${data.targetId}`);
-        const targetData = await targetRes.json();
-        setTarget(targetData);
-      } 
-      // If player is dead, fetch assassinations to see who killed them
-      else if (!data.alive) {
-        const assassinationsRes = await fetch(`/api/assassinations?victimId=${playerId}`);
-        const assassinationsData = await assassinationsRes.json();
-        if (assassinationsData.length > 0) {
-          const killerRes = await fetch(`/api/players/${assassinationsData[0].killerId}`);
-          const killerData = await killerRes.json();
-          setKiller(killerData);
-        }
+  const fetchPlayer = async () => {
+    const res = await fetch(`/api/players/${playerId}`);
+    const data = await res.json();
+    setPlayer(data);
+    
+    // If player is alive and has a target, fetch target info
+    if (data.alive && data.targetId) {
+      const targetRes = await fetch(`/api/players/${data.targetId}`);
+      const targetData = await targetRes.json();
+      setTarget(targetData);
+    } 
+    // If player is dead, fetch assassinations to see who killed them
+    else if (!data.alive) {
+      const assassinationsRes = await fetch(`/api/assassinations?victimId=${playerId}`);
+      const assassinationsData = await assassinationsRes.json();
+      if (assassinationsData.length > 0) {
+        const killerRes = await fetch(`/api/players/${assassinationsData[0].killerId}`);
+        const killerData = await killerRes.json();
+        setKiller(killerData);
       }
-    };
-    
-    const fetchGameStatus = async () => {
-      const res = await fetch(`/api/games/${gameId}/status`);
-      const data = await res.json();
-      setGameStatus(data.status);
-    };
-    
+    }
+  };
+  
+  const fetchGameStatus = async () => {
+    const res = await fetch(`/api/games/${gameId}/status`);
+    const data = await res.json();
+    setGameStatus(data.status);
+  };
+
+  const fetchAssassinationCount = async () => {
+    const res = await fetch(`/api/assassinations?killerId=${playerId}`);
+    const data = await res.json();
+    setAssassinationCount(data.length);
+  };
+  
+  useEffect(() => {
     fetchPlayer();
     fetchGameStatus();
+    fetchAssassinationCount();
   }, [playerId, gameId]);
-
 
   const confirmKill = async () => {
     const res = await fetch("/api/assassinations", {
@@ -61,8 +68,12 @@ export default function PlayerDashboard() {
       body: JSON.stringify({ gameId, killerId: playerId, victimCode }),
     });
     const data = await res.json();
-      if (res.ok) {
+    if (res.ok) {
       setMessage("✅ Assassinat confirmé !");
+      // Reload player data and game status
+      fetchPlayer();
+      fetchGameStatus();
+      fetchAssassinationCount();
     } else {
       setMessage(`❌ ${data.error || "Échec de la confirmation de l&apos;assassinat"}`);
     }
@@ -81,6 +92,7 @@ export default function PlayerDashboard() {
       <div className="bg-black bg-opacity-50 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-8 w-full max-w-2xl mx-4 border border-[#ff4ecd] shadow-[0_0_15px_rgba(255,78,205,0.3)] flex flex-col gap-4 sm:gap-6">
         <div className="flex flex-col gap-2 text-base sm:text-lg font-semibold">
           <p>🧑 <span className="text-[#00ffe7] glow-cyan">Votre Nom :</span> {player.name}</p>
+          <p>🗡️ <span className="text-[#ff4ecd] glow-text">Score :</span> {assassinationCount} assassinat{assassinationCount !== 1 ? 's' : ''}</p>
           <p>🕵️ <span className="text-[#7a5fff] glow-purple">Code Secret :</span> {player.uniqueCode}</p>
           {player.alive && (
           <p>🎯 <span className="text-[#ff4ecd] glow-text">Mission :</span> {gameStatus === "NOT_STARTED" 
