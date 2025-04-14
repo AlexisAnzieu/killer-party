@@ -22,11 +22,19 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    const notification_url = process.env.CLOUDINARY_WEBHOOK_URL;
+
     const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ folder: `killer-game/${gameId}` }, (error, result) => {
-        if (error || !result) return reject(error || new Error('Upload failed'));
-        resolve(result);
-      }).end(buffer);
+      cloudinary.uploader.upload_stream(
+        {
+          folder: `killer-game/${gameId}`,
+          ...(notification_url ? { notification_url } : {})
+        },
+        (error, result) => {
+          if (error || !result) return reject(error || new Error('Upload failed'));
+          resolve(result);
+        }
+      ).end(buffer);
     });
 
     return NextResponse.json({ url: uploadResult.secure_url });
