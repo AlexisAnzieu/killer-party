@@ -121,7 +121,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ game
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
 
-    const alivePlayers = game.players.filter((p) => p.alive).map((p) => ({
+    const alivePlayers = game.players.filter((p) => p.alive && p.photoUrl).map((p) => ({
       id: p.id,
       name: p.name,
       photoUrl: p.photoUrl,
@@ -133,11 +133,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ game
       photoUrl: p.photoUrl,
     }));
 
+    const offlinePlayers = game.players.filter((p) => !p.photoUrl).map((p) => ({
+      id: p.id,
+      name: p.name,
+      photoUrl: null,
+    }));
+
     const winner = game.status === 'ENDED' && alivePlayers.length === 1 ? alivePlayers[0] : null;
 
     return NextResponse.json({
       status: game.status,
       alivePlayers,
+      offlinePlayers,
       eliminatedPlayers,
       winner,
     });
