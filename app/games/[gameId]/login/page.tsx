@@ -120,6 +120,10 @@ export default function PlayerLoginPage() {
       const formData = new FormData();
       formData.append("gameId", gameId);  
       formData.append("file", file);
+      const selectedPlayer = players.find(p => p.id === selectedPlayerId);
+      if (selectedPlayer) {
+        formData.append("name", selectedPlayer.name);
+      }
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
