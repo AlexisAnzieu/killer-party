@@ -92,7 +92,7 @@ export default function PlayerLoginPage() {
     const fetchPlayers = async () => {
       const res = await fetch(`/api/games/${gameId}/status`);
       const data = await res.json();
-      const allPlayers = [...data.alivePlayers, ...data.eliminatedPlayers]
+      const allPlayers = [...data.offlinePlayers]
         .filter((p) => !p.photoUrl)
         .sort((a, b) => a.name.localeCompare(b.name));
       setPlayers(allPlayers);
