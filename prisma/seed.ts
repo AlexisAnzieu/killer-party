@@ -79,13 +79,12 @@ const missions =  [
 ];
 
 async function main() {
-  for (const description of missions) {
-    await prisma.mission.upsert({
-      where: { description },
-      update: {},
-      create: { description },
-    });
-  }
+  await prisma.mission.createMany({
+    data: missions.map(description => ({ description })),
+    skipDuplicates: true, // This option prevents errors if a mission with the same unique field (description) already exists
+  });
+
+  console.log(`Seeded ${missions.length} potential missions.`);
 }
 
 main()

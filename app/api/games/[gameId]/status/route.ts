@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GameStatus } from '@prisma/client';
+import { GameStatus, Player as PrismaPlayer } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
 
@@ -113,31 +113,43 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ game
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: {
-        players: true,
+        players: {
+          orderBy: {
+            updatedAt: 'desc', // Order players by updatedAt descending
+          },
+        },
       },
     });
 
     if (!game) {
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
+    const alivePlayers = game!.players
+      .filter((p: PrismaPlayer) => p.alive && p.photoUrl)
+      .map((p: PrismaPlayer) => ({
+        id: p.id,
+        name: p.name,
+        photoUrl: p.photoUrl,
+        updatedAt: p.updatedAt,
+      }));
 
-    const alivePlayers = game.players.filter((p) => p.alive && p.photoUrl).map((p) => ({
-      id: p.id,
-      name: p.name,
-      photoUrl: p.photoUrl,
-    }));
+    const eliminatedPlayers = game!.players
+      .filter((p: PrismaPlayer) => !p.alive)
+      .map((p: PrismaPlayer) => ({
+        id: p.id,
+        name: p.name,
+        photoUrl: p.photoUrl,
+        updatedAt: p.updatedAt,
+      }));
 
-    const eliminatedPlayers = game.players.filter((p) => !p.alive).map((p) => ({
-      id: p.id,
-      name: p.name,
-      photoUrl: p.photoUrl,
-    }));
-
-    const offlinePlayers = game.players.filter((p) => !p.photoUrl).map((p) => ({
-      id: p.id,
-      name: p.name,
-      photoUrl: null,
-    }));
+    const offlinePlayers = game!.players
+      .filter((p: PrismaPlayer) => !p.photoUrl)
+      .map((p: PrismaPlayer) => ({
+        id: p.id,
+        name: p.name,
+        photoUrl: null,
+        updatedAt: p.updatedAt,
+      }));
 
     const winner = game.status === 'ENDED' && alivePlayers.length === 1 ? alivePlayers[0] : null;
 

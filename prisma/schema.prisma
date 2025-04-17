@@ -25,10 +25,11 @@ model Game {
 model Player {
   id         String   @id @default(cuid())
   name       String
-  photoUrl   String
+  photoUrl   String?
   uniqueCode String
   alive      Boolean  @default(true)
   gameId     String
+  updatedAt  DateTime @updatedAt
   game       Game     @relation(fields: [gameId], references: [id])
   targetId   String?
   target     Player?  @relation("PlayerTarget", fields: [targetId], references: [id])

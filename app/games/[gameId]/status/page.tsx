@@ -4,14 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-interface OnlinePlayer extends Player {
-  photoUrl: string;
-}
-
 interface Player {
   id: string;
   name: string;
   photoUrl: string | null;
+  updatedAt: string;
+}
+
+interface OnlinePlayer extends Player {
+  photoUrl: string;
 }
 
 export default function GameStatusPage() {
@@ -102,10 +103,11 @@ export default function GameStatusPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-10 w-full max-w-4xl px-2 sm:px-4">
         {alivePlayers.map((p) => (
           <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.2)] hover:shadow-[0_0_20px_rgba(0,255,231,0.4)] hover:scale-105 transition-all duration-300">
-            <p className="font-semibold text-[#00ffe7] text-sm sm:text-base truncate w-full text-center">{p.name}</p>
-           
-              <img src={p.photoUrl} alt="Selfie du joueur" className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.3)]" />
-           
+            <div className="flex flex-col items-center w-full">
+              <p className="font-semibold text-[#00ffe7] text-sm sm:text-base truncate w-full text-center">{p.name}</p>
+              <p className="text-xs text-gray-400 mb-2">Mis à jour {new Date(p.updatedAt).toLocaleString('fr-FR')}</p>
+              <img src={p.photoUrl} alt="Selfie du joueur" className="w-60 h-60 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.3)]" />
+            </div>
           </Link>
         ))}
       </div>
@@ -114,9 +116,11 @@ export default function GameStatusPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full max-w-4xl px-2 sm:px-4 opacity-60">
         {eliminatedPlayers.map((p) => (
           <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.2)]">
-            <p className="font-semibold text-[#ff4ecd] text-sm sm:text-base truncate w-full text-center">{p.name}</p>
-              <img src={p.photoUrl} alt="Selfie du joueur" className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.3)]" />
-           
+            <div className="flex flex-col items-center w-full">
+              <p className="font-semibold text-[#ff4ecd] text-sm sm:text-base truncate w-full text-center">{p.name}</p>
+              <p className="text-xs text-gray-400 mb-2">Mis à jour {new Date(p.updatedAt).toLocaleString('fr-FR')}</p>
+              <img src={p.photoUrl} alt="Selfie du joueur" className="w-60 h-60 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.3)]" />
+            </div>
           </Link>
         ))}
       </div>
@@ -125,9 +129,12 @@ export default function GameStatusPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full max-w-4xl px-2 sm:px-4 opacity-60">
         {offlinePlayers.map((p) => (
           <Link key={p.id} href={`/games/${gameId}/player/${p.id}`} className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-gray-400 shadow-[0_0_10px_rgba(156,163,175,0.2)]">
-            <p className="font-semibold text-gray-400 text-sm sm:text-base truncate w-full text-center">{p.name}</p>
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0d0221] border-2 border-gray-400 flex items-center justify-center text-gray-400 font-bold shadow-[0_0_10px_rgba(156,163,175,0.3)]">
-              {p.name.charAt(0)}
+            <div className="flex flex-col items-center w-full">
+              <p className="font-semibold text-gray-400 text-sm sm:text-base truncate w-full text-center">{p.name}</p>
+              <p className="text-xs text-gray-400 mb-2">Mis à jour {new Date(p.updatedAt).toLocaleString('fr-FR')}</p>
+              <div className="w-60 h-60 sm:w-24 sm:h-24 rounded-full bg-[#0d0221] border-2 border-gray-400 flex items-center justify-center text-gray-400 font-bold shadow-[0_0_10px_rgba(156,163,175,0.3)]">
+                {p.name.charAt(0)}
+              </div>
             </div>
           </Link>
         ))}
