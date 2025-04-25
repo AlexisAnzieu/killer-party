@@ -13,12 +13,13 @@ CREATE TABLE `Game` (
 CREATE TABLE `Player` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `photoUrl` VARCHAR(191) NOT NULL,
+    `photoUrl` VARCHAR(191) NULL,
     `uniqueCode` VARCHAR(191) NOT NULL,
     `alive` BOOLEAN NOT NULL DEFAULT true,
     `gameId` VARCHAR(191) NOT NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
     `targetId` VARCHAR(191) NULL,
-    `missionId` VARCHAR(191) NOT NULL,
+    `missionId` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -50,7 +51,7 @@ ALTER TABLE `Player` ADD CONSTRAINT `Player_gameId_fkey` FOREIGN KEY (`gameId`) 
 ALTER TABLE `Player` ADD CONSTRAINT `Player_targetId_fkey` FOREIGN KEY (`targetId`) REFERENCES `Player`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Player` ADD CONSTRAINT `Player_missionId_fkey` FOREIGN KEY (`missionId`) REFERENCES `Mission`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Player` ADD CONSTRAINT `Player_missionId_fkey` FOREIGN KEY (`missionId`) REFERENCES `Mission`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Assassination` ADD CONSTRAINT `Assassination_gameId_fkey` FOREIGN KEY (`gameId`) REFERENCES `Game`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -10,14 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'At least two player names required' }, { status: 400 });
     }
 
-    const missions = await prisma.mission.findMany();
-    if (missions.length === 0) {
-      return NextResponse.json({ error: 'No missions available' }, { status: 500 });
-    }
-
     const playersData = playerNames.map((playerName) => {
-      const randomMission = missions[Math.floor(Math.random() * missions.length)];
-
       // Clean the player name: remove special characters but keep letters, numbers, spaces, accents, and apostrophes
       const cleanedName = playerName.replace(/[^a-zA-ZÀ-ÿ0-9 ']/g, '').trim();
 
@@ -30,7 +23,6 @@ export async function POST(req: NextRequest) {
         name: cleanedName,
         photoUrl: "",
         uniqueCode,
-        missionId: randomMission.id,
       };
     });
 
