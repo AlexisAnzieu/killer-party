@@ -25,10 +25,10 @@ const getPlayers = async (gameId: string) => {
 export default async function GalleryPage({
   params,
 }: {
-  params: { gameId: string };
+  params: Promise<{ gameId: string }>;
 }) {
-  const allPlayers = await getPlayers(params.gameId);
-console.log(allPlayers)
+  const { gameId } = await params;
+  const allPlayers = await getPlayers(gameId);
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">Cyber-Trombinoscope</h1>
