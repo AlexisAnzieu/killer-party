@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GameStatus, Player as PrismaPlayer } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
+// Configure Vercel serverless function with 1 minute timeout
+export const config = {
+  runtime: 'edge',
+  maxDuration: 60, // Set timeout to 60 seconds (1 minute)
+};
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
   try {
