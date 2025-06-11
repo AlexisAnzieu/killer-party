@@ -31,7 +31,7 @@ export default async function GalleryPage({
   const allPlayers = await getPlayers(gameId);
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">Cyber-Trombinoscope</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">Trombinoscope</h1>
       <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {allPlayers.map((player) => (
           <div

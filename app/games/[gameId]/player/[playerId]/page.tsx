@@ -59,6 +59,17 @@ export default function PlayerDashboard() {
     fetchPlayer();
     fetchGameStatus();
     fetchAssassinationCount();
+    
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerId, gameId]);
 
   const confirmKill = async () => {
@@ -89,6 +100,9 @@ export default function PlayerDashboard() {
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-center">
         Tableau de Bord
       </h1>
+      <div className="bg-red-600 text-white p-2 sm:p-3 rounded-lg mb-4 sm:mb-6 text-center font-bold animate-pulse max-w-2xl w-full">
+        ⚠️ ATTENTION : Ne jamais fermer cet onglet pendant la partie ! ⚠️
+      </div>
       <div className="bg-black bg-opacity-50 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-8 w-full max-w-2xl mx-4 border border-[#ff4ecd] shadow-[0_0_15px_rgba(255,78,205,0.3)] flex flex-col gap-4 sm:gap-6">
         <div className="flex flex-col gap-2 text-base sm:text-lg font-semibold">
           <p>🧑 <span className="text-[#00ffe7] glow-cyan">Votre Nom :</span> {player.name}</p>
