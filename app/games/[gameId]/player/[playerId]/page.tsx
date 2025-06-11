@@ -96,7 +96,7 @@ export default function PlayerDashboard() {
           <p>🕵️ <span className="text-[#7a5fff] glow-purple">Code Secret :</span> {player.uniqueCode}</p>
           {player.alive && (
           <p>🎯 <span className="text-[#ff4ecd] glow-text">Mission :</span> {gameStatus === "NOT_STARTED" 
-            ? "début du jeu à 21h" 
+            ? "La partie n'a pas encore commencé." 
             : player.mission?.description}</p>)}
           
           {!player.alive && (
