@@ -6,22 +6,11 @@ import { useRouter } from "next/navigation";
 export default function NewGamePage() {
   const router = useRouter();
   const [gameName, setGameName] = useState("");
-  const [playersText, setPlayersText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [, setGameId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const createGame = async () => {
-    const playerNames = playersText
-      .split("\n")
-      .map((name) => name.trim())
-      .filter((name) => name.length > 0);
-
-    if (playerNames.length < 2) {
-      setError("Il faut au moins 2 joueurs pour créer une partie");
-      return;
-    }
-
     setError(null);
     setIsLoading(true);
 
@@ -29,7 +18,7 @@ export default function NewGamePage() {
       const res = await fetch("/api/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: gameName, playerNames }),
+        body: JSON.stringify({ name: gameName }),
       });
       const data = await res.json();
 
@@ -40,7 +29,7 @@ export default function NewGamePage() {
 
       setGameId(data.gameId);
       router.push(`/games/${data.gameId}/status`);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError("Une erreur est survenue lors de la création de la partie");
     } finally {
@@ -61,15 +50,6 @@ export default function NewGamePage() {
           onChange={(e) => setGameName(e.target.value)}
           className="w-full p-3 sm:p-4 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#00ffe7] shadow-[0_0_10px_rgba(0,255,231,0.3)] hover:shadow-[0_0_20px_rgba(0,255,231,0.5)] hover:scale-105 transition-all duration-300 text-sm sm:text-base placeholder:text-[#00ffe7]/50"
         />
-        <div className="space-y-2 sm:space-y-3">
-          <h2 className="text-md sm:text-xl font-bold text-[#ff4ecd] glow-text px-2">👥 Ajouter des Joueurs (un nom par ligne)</h2>
-          <textarea
-            placeholder="Entrez un nom de joueur par ligne"
-            value={playersText}
-            onChange={(e) => setPlayersText(e.target.value)}
-            className="w-full p-4 sm:p-6 rounded-2xl bg-black text-[#00ffe7] font-semibold border border-[#7a5fff] shadow-[0_0_10px_rgba(122,95,255,0.3)] hover:shadow-[0_0_20px_rgba(122,95,255,0.5)] hover:scale-105 transition-all duration-300 h-48 sm:h-56 resize-none text-sm sm:text-base placeholder:text-[#00ffe7]/50"
-          />
-        </div>
         {error && (
           <div className="text-red-500  text-sm font-medium bg-red-100/10 p-3 rounded-lg border border-red-500/50">
             ⚠️ {error}

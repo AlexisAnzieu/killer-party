@@ -26,10 +26,6 @@ export default function GameStatusPage() {
   );
   const [winner, setWinner] = useState<Player | null>(null);
   const [offlinePlayers, setOfflinePlayers] = useState<Player[]>([]);
-  const [newPlayerName, setNewPlayerName] = useState<string>("");
-  const [addingPlayer, setAddingPlayer] = useState<boolean>(false);
-  const [addPlayerError, setAddPlayerError] = useState<string>("");
-  const [addPlayerSuccess, setAddPlayerSuccess] = useState<string>("");
   const [linkCopied, setLinkCopied] = useState<boolean>(false);
   const [registrationLink, setRegistrationLink] = useState<string>("");
 
@@ -66,54 +62,6 @@ export default function GameStatusPage() {
       }
     } catch (error) {
       console.error("Error updating status:", error);
-    }
-  };
-
-  const addPlayer = async () => {
-    if (!newPlayerName.trim()) {
-      setAddPlayerError("Veuillez entrer un nom de joueur");
-      return;
-    }
-
-    setAddingPlayer(true);
-    setAddPlayerError("");
-    setAddPlayerSuccess("");
-
-    try {
-      const res = await fetch(`/api/games/${gameId}/players`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerName: newPlayerName }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setAddPlayerError(data.error || "Erreur lors de l'ajout du joueur");
-        return;
-      }
-
-      // Add the new player to the offline players list
-      const newPlayer = {
-        id: data.id,
-        name: data.name,
-        photoUrl: null,
-        updatedAt: data.updatedAt,
-      };
-
-      setOfflinePlayers([newPlayer, ...offlinePlayers]);
-      setNewPlayerName("");
-      setAddPlayerSuccess(`Joueur ${data.name} ajouté avec succès !`);
-
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setAddPlayerSuccess("");
-      }, 3000);
-    } catch (error) {
-      console.error("Error adding player:", error);
-      setAddPlayerError("Une erreur est survenue lors de l'ajout du joueur");
-    } finally {
-      setAddingPlayer(false);
     }
   };
 
@@ -178,51 +126,6 @@ export default function GameStatusPage() {
           <p className="text-xs text-gray-300 italic">
             Cliquez sur le lien pour le copier
           </p>
-        </div>
-      )}
-
-      {status === "NOT_STARTED" && (
-        <div className="mb-6 sm:mb-10 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-black bg-opacity-50 backdrop-blur-md border border-[#7a5fff] shadow-[0_0_15px_rgba(122,95,255,0.3)] flex flex-col items-center gap-3 sm:gap-4 w-full max-w-sm mx-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#7a5fff] glow-purple">
-            👤 Ajouter un Joueur
-          </h2>
-
-          <div className="w-full">
-            <input
-              type="text"
-              placeholder="Nom du joueur"
-              value={newPlayerName}
-              onChange={(e) => setNewPlayerName(e.target.value)}
-              className="w-full p-3 sm:p-4 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#7a5fff] shadow-[0_0_10px_rgba(122,95,255,0.3)] hover:shadow-[0_0_20px_rgba(122,95,255,0.5)] focus:scale-105 transition-all duration-300 mb-2"
-            />
-            {addPlayerError && (
-              <p className="text-red-500 text-sm mt-1 px-3">{addPlayerError}</p>
-            )}
-            {addPlayerSuccess && (
-              <p className="text-green-400 text-sm mt-1 px-3">
-                {addPlayerSuccess}
-              </p>
-            )}
-          </div>
-
-          <button
-            onClick={addPlayer}
-            disabled={addingPlayer || !newPlayerName.trim()}
-            className={`w-full px-6 py-3 font-bold rounded-full transition-all duration-300 text-white ${
-              addingPlayer || !newPlayerName.trim()
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-[#7a5fff] shadow-[0_0_15px_rgba(122,95,255,0.4)] hover:shadow-[0_0_30px_rgba(122,95,255,0.6)] hover:scale-105"
-            }`}
-          >
-            {addingPlayer ? (
-              <>
-                <span className="inline-block animate-spin mr-2">⟳</span>
-                Ajout en cours...
-              </>
-            ) : (
-              "➕ Ajouter le Joueur"
-            )}
-          </button>
         </div>
       )}
 
