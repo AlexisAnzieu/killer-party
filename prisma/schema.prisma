@@ -6,6 +6,7 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
 enum GameStatus {
   NOT_STARTED
   IN_PROGRESS
@@ -13,19 +14,19 @@ enum GameStatus {
 }
 
 model Game {
-  id        String   @id @default(cuid())
-  name      String?
-  status    GameStatus @default(NOT_STARTED)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  players   Player[]
+  id             String          @id @default(cuid())
+  name           String?
+  status         GameStatus      @default(NOT_STARTED)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  players        Player[]
   assassinations Assassination[]
 }
 
 model Player {
   id         String   @id @default(cuid())
   name       String
-  photoUrl   String?
+  photoUrl   String
   uniqueCode String
   alive      Boolean  @default(true)
   gameId     String
@@ -37,8 +38,8 @@ model Player {
   missionId  String?
   mission    Mission? @relation(fields: [missionId], references: [id])
 
-  kills      Assassination[] @relation("Killer")
-  deaths     Assassination[] @relation("Victim")
+  kills  Assassination[] @relation("Killer")
+  deaths Assassination[] @relation("Victim")
 }
 
 model Mission {

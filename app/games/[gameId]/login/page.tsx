@@ -75,23 +75,7 @@ export default function PlayerLoginPage() {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26))
       ).join("");
 
-      // First, create the player with a temporary entry
-      const playerRes = await fetch(`/api/games/${gameId}/players`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: playerName.trim(),
-          uniqueCode,
-        }),
-      });
-
-      if (!playerRes.ok) {
-        throw new Error("Failed to create player");
-      }
-
-      const { playerId } = await playerRes.json();
-
-      // Then upload the photo
+      // First, upload the photo and get the URL
       const formData = new FormData();
       formData.append("gameId", gameId);
       formData.append("file", file);
@@ -108,12 +92,22 @@ export default function PlayerLoginPage() {
 
       const { url: photoUrl } = await uploadRes.json();
 
-      // Finally, update the player with the photo URL
-      await fetch(`/api/players/${playerId}`, {
-        method: "PATCH",
+      // Then, create the player with photoUrl included
+      const playerRes = await fetch(`/api/games/${gameId}/players`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photoUrl }),
+        body: JSON.stringify({
+          name: playerName.trim(),
+          uniqueCode,
+          photoUrl,
+        }),
       });
+
+      if (!playerRes.ok) {
+        throw new Error("Failed to create player");
+      }
+
+      const { playerId } = await playerRes.json();
 
       setMessage("🎉 Inscription réussie !");
       router.push(`/games/${gameId}/player/${playerId}`);

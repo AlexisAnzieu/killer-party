@@ -1,19 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { GameStatus, Player as PrismaPlayer } from '@prisma/client';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { GameStatus, Player as PrismaPlayer } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ gameId: string }> }
+) {
   try {
     const { gameId } = await params;
     const data = await req.json();
     const { status } = data as { status: string };
 
     if (!status) {
-      return NextResponse.json({ error: 'Missing status' }, { status: 400 });
+      return NextResponse.json({ error: "Missing status" }, { status: 400 });
     }
 
     if (!Object.values(GameStatus).includes(status as GameStatus)) {
-      return NextResponse.json({ error: 'Invalid status value' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid status value" },
+        { status: 400 }
+      );
     }
 
     // Fetch current game status
@@ -23,21 +29,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ga
     });
 
     if (!game) {
-      return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+      return NextResponse.json({ error: "Game not found" }, { status: 404 });
     }
 
     const currentStatus = game.status;
 
     // If transitioning from NOT_STARTED to IN_PROGRESS, assign targets and missions
-    if (currentStatus === 'NOT_STARTED' && status === 'IN_PROGRESS') {
+    if (currentStatus === "NOT_STARTED" && status === "IN_PROGRESS") {
       // Filter alive players with a photo
       const eligiblePlayers = game.players.filter(
-        (p) => p.alive && p.photoUrl && p.photoUrl.trim() !== ''
+        (p) => p.alive && p.photoUrl && p.photoUrl.trim() !== ""
       );
 
       if (eligiblePlayers.length < 2) {
         return NextResponse.json(
-          { error: 'Not enough players with photos to start the game' },
+          { error: "Not enough players with photos to start the game" },
           { status: 400 }
         );
       }
@@ -47,11 +53,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ga
 
       // Fetch all missions
       const missions = await prisma.mission.findMany();
-      
+
       // Ensure we have enough unique missions for all players
       if (missions.length < shuffledPlayers.length) {
         return NextResponse.json(
-          { error: 'Not enough unique missions for all players' },
+          { error: "Not enough unique missions for all players" },
           { status: 400 }
         );
       }
@@ -66,7 +72,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ga
       for (let i = 0; i < shuffledPlayers.length; i++) {
         const killer = shuffledPlayers[i];
         const target = shuffledPlayers[(i + 1) % shuffledPlayers.length];
-        
+
         // Find an unused mission - this ensures each player gets a different mission
         let missionIndex = i % shuffledMissions.length;
         while (usedMissionIds.has(shuffledMissions[missionIndex].id)) {
@@ -74,12 +80,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ga
           // Safety check: if we've gone through all missions and found none available
           if (usedMissionIds.size >= missions.length) {
             return NextResponse.json(
-              { error: 'Could not assign unique missions to all players' },
+              { error: "Could not assign unique missions to all players" },
               { status: 400 }
             );
           }
         }
-        
+
         const mission = shuffledMissions[missionIndex];
         usedMissionIds.add(mission.id);
 
@@ -102,11 +108,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ga
     return NextResponse.json({ status: updatedGame.status });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Failed to update game status' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update game status" },
+      { status: 500 }
+    );
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ gameId: string }> }
+) {
   try {
     const { gameId } = await params;
 
@@ -115,53 +127,47 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ game
       include: {
         players: {
           orderBy: {
-            updatedAt: 'desc', // Order players by updatedAt descending
+            updatedAt: "desc", // Order players by updatedAt descending
           },
         },
       },
     });
 
     if (!game) {
-      return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+      return NextResponse.json({ error: "Game not found" }, { status: 404 });
     }
-    const alivePlayers = game!.players
-      .filter((p: PrismaPlayer) => p.alive && p.photoUrl)
-      .map((p: PrismaPlayer) => ({
-        id: p.id,
-        name: p.name,
-        photoUrl: p.photoUrl,
-        updatedAt: p.updatedAt,
-      }));
+    // Utility function to map player data
+    const mapPlayer = (p: PrismaPlayer) => ({
+      id: p.id,
+      name: p.name,
+      photoUrl: p.photoUrl,
+      updatedAt: p.updatedAt,
+    });
 
-    const eliminatedPlayers = game!.players
+    const alivePlayers = game.players
+      .filter((p: PrismaPlayer) => p.alive)
+      .map(mapPlayer);
+
+    const eliminatedPlayers = game.players
       .filter((p: PrismaPlayer) => !p.alive)
-      .map((p: PrismaPlayer) => ({
-        id: p.id,
-        name: p.name,
-        photoUrl: p.photoUrl,
-        updatedAt: p.updatedAt,
-      }));
+      .map(mapPlayer);
 
-    const offlinePlayers = game!.players
-      .filter((p: PrismaPlayer) => !p.photoUrl)
-      .map((p: PrismaPlayer) => ({
-        id: p.id,
-        name: p.name,
-        photoUrl: null,
-        updatedAt: p.updatedAt,
-      }));
-
-    const winner = game.status === 'ENDED' && alivePlayers.length === 1 ? alivePlayers[0] : null;
+    const winner =
+      game.status === "ENDED" && alivePlayers.length === 1
+        ? alivePlayers[0]
+        : null;
 
     return NextResponse.json({
       status: game.status,
       alivePlayers,
-      offlinePlayers,
       eliminatedPlayers,
       winner,
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Failed to fetch game status' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch game status" },
+      { status: 500 }
+    );
   }
 }

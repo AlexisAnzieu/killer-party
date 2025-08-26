@@ -7,7 +7,7 @@ export async function POST(
 ) {
   try {
     const { gameId } = await params;
-    const { name, uniqueCode } = await req.json();
+    const { name, uniqueCode, photoUrl } = await req.json();
 
     const game = await prisma.game.findUnique({
       where: { id: gameId },
@@ -24,10 +24,18 @@ export async function POST(
       );
     }
 
+    if (!photoUrl || typeof photoUrl !== "string" || photoUrl.trim() === "") {
+      return NextResponse.json(
+        { error: "Photo is required to create a player" },
+        { status: 400 }
+      );
+    }
+
     const player = await prisma.player.create({
       data: {
         name,
         uniqueCode,
+        photoUrl,
         gameId,
       },
     });

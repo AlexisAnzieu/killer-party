@@ -25,7 +25,6 @@ export default function GameStatusPage() {
     []
   );
   const [winner, setWinner] = useState<Player | null>(null);
-  const [offlinePlayers, setOfflinePlayers] = useState<Player[]>([]);
   const [linkCopied, setLinkCopied] = useState<boolean>(false);
   const [registrationLink, setRegistrationLink] = useState<string>("");
 
@@ -37,7 +36,6 @@ export default function GameStatusPage() {
       setAlivePlayers(data.alivePlayers);
       setEliminatedPlayers(data.eliminatedPlayers);
       setWinner(data.winner);
-      setOfflinePlayers(data.offlinePlayers || []);
     };
     fetchStatus();
 
@@ -215,54 +213,27 @@ export default function GameStatusPage() {
       <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-red-500 ">
         🔴 Joueurs Éliminés
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full max-w-4xl px-2 sm:px-4 opacity-60">
-        {eliminatedPlayers.map((p) => (
-          <Link
-            key={p.id}
-            href={`/games/${gameId}/player/${p.id}`}
-            className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.2)]"
-          >
-            <div className="flex flex-col items-center w-full">
-              <p className="font-semibold text-[#ff4ecd] text-sm sm:text-base truncate w-full text-center">
-                {p.name}
-              </p>
-              <p className="text-xs text-gray-400 mb-2">
-                Mis à jour {new Date(p.updatedAt).toLocaleString("fr-FR")}
-              </p>
-              <img
-                src={p.photoUrl}
-                alt="Selfie du joueur"
-                className="w-60 h-60 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.3)]"
-              />
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-400">
-        ⚫ Joueurs non authentifiés
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full max-w-4xl px-2 sm:px-4 opacity-60">
-        {offlinePlayers.map((p) => (
-          <Link
-            key={p.id}
-            href={`/games/${gameId}/player/${p.id}`}
-            className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-gray-400 shadow-[0_0_10px_rgba(156,163,175,0.2)]"
-          >
-            <div className="flex flex-col items-center w-full">
-              <p className="font-semibold text-gray-400 text-sm sm:text-base truncate w-full text-center">
-                {p.name}
-              </p>
-              <p className="text-xs text-gray-400 mb-2">
-                Mis à jour {new Date(p.updatedAt).toLocaleString("fr-FR")}
-              </p>
-              <div className="w-60 h-60 sm:w-24 sm:h-24 rounded-full bg-[#0d0221] border-2 border-gray-400 flex items-center justify-center text-gray-400 font-bold shadow-[0_0_10px_rgba(156,163,175,0.3)]">
-                {p.name.charAt(0)}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {eliminatedPlayers.map((p) => (
+        <Link
+          key={p.id}
+          href={`/games/${gameId}/player/${p.id}`}
+          className="bg-black bg-opacity-50 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 border border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.2)]"
+        >
+          <div className="flex flex-col items-center w-full">
+            <p className="font-semibold text-[#ff4ecd] text-sm sm:text-base truncate w-full text-center">
+              {p.name}
+            </p>
+            <p className="text-xs text-gray-400 mb-2">
+              Mis à jour {new Date(p.updatedAt).toLocaleString("fr-FR")}
+            </p>
+            <img
+              src={p.photoUrl}
+              alt="Selfie du joueur"
+              className="w-60 h-60 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-[#ff4ecd] shadow-[0_0_10px_rgba(255,78,205,0.3)]"
+            />
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }
