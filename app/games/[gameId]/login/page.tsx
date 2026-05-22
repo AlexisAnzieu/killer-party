@@ -4,6 +4,112 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
+const MAX_UPLOAD_IMAGE_BYTES = 100 * 1024;
+const IMAGE_MAX_DIMENSIONS = [
+  1024, 768, 640, 512, 384, 320, 256, 192, 160, 128, 96,
+];
+const IMAGE_COMPRESSION_QUALITIES = [
+  0.82, 0.74, 0.66, 0.58, 0.5, 0.42, 0.34, 0.26, 0.18, 0.1,
+];
+
+const loadImage = (file: File) =>
+  new Promise<HTMLImageElement>((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new window.Image();
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Impossible de lire la photo"));
+    };
+
+    image.src = objectUrl;
+  });
+
+const drawResizedImage = (image: HTMLImageElement, maxDimension: number) => {
+  const scale = Math.min(
+    1,
+    maxDimension / Math.max(image.naturalWidth, image.naturalHeight),
+  );
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("Impossible de compresser la photo");
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, width, height);
+  context.imageSmoothingQuality = "high";
+  context.drawImage(image, 0, 0, width, height);
+
+  return canvas;
+};
+
+const canvasToBlob = (canvas: HTMLCanvasElement, quality: number) =>
+  new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+          return;
+        }
+
+        reject(new Error("Impossible de compresser la photo"));
+      },
+      "image/jpeg",
+      quality,
+    );
+  });
+
+const compressedFileName = (fileName: string) => {
+  const baseName = fileName.replace(/\.[^/.]+$/, "");
+  return `${baseName || "photo"}.jpg`;
+};
+
+const resizeImageToUnder100Kb = async (file: File) => {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Le fichier selectionne n'est pas une image");
+  }
+
+  if (file.size < MAX_UPLOAD_IMAGE_BYTES) {
+    return file;
+  }
+
+  const image = await loadImage(file);
+  let smallestFile: File | null = null;
+
+  for (const maxDimension of IMAGE_MAX_DIMENSIONS) {
+    const canvas = drawResizedImage(image, maxDimension);
+
+    for (const quality of IMAGE_COMPRESSION_QUALITIES) {
+      const blob = await canvasToBlob(canvas, quality);
+      const compressedFile = new File([blob], compressedFileName(file.name), {
+        type: "image/jpeg",
+        lastModified: Date.now(),
+      });
+
+      if (!smallestFile || compressedFile.size < smallestFile.size) {
+        smallestFile = compressedFile;
+      }
+
+      if (compressedFile.size < MAX_UPLOAD_IMAGE_BYTES) {
+        return compressedFile;
+      }
+    }
+  }
+
+  throw new Error("Impossible de compresser la photo sous 100 KB");
+};
+
 export default function PlayerLoginPage() {
   const params = useParams();
   const router = useRouter();
@@ -19,7 +125,7 @@ export default function PlayerLoginPage() {
 
   const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
+      navigator.userAgent,
     );
   };
 
@@ -72,13 +178,15 @@ export default function PlayerLoginPage() {
     try {
       // Generate a unique code (3 random uppercase letters)
       const uniqueCode = Array.from({ length: 3 }, () =>
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26))
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26)),
       ).join("");
+
+      const resizedFile = await resizeImageToUnder100Kb(file);
 
       // First, upload the photo and get the URL
       const formData = new FormData();
       formData.append("gameId", gameId);
-      formData.append("file", file);
+      formData.append("file", resizedFile);
       formData.append("name", playerName.trim());
 
       const uploadRes = await fetch("/api/upload", {
@@ -142,10 +250,14 @@ export default function PlayerLoginPage() {
             </div>
 
             <div>
-              <label className="block mb-2 font-semibold text-lg text-[#ff4ecd] glow-text text-center">
+              <label
+                htmlFor="selfie-upload"
+                className="block mb-2 font-semibold text-lg text-[#ff4ecd] glow-text text-center"
+              >
                 Vérification d&apos;identité
               </label>
               <button
+                type="button"
                 onClick={openCamera}
                 className="flex items-center justify-center w-full p-3 rounded-full bg-black text-[#00ffe7] font-semibold border border-[#7a5fff] shadow-[0_0_10px_rgba(122,95,255,0.3)] hover:shadow-[0_0_20px_rgba(122,95,255,0.5)] hover:scale-105 transition-all duration-300 cursor-pointer"
               >
@@ -184,6 +296,7 @@ export default function PlayerLoginPage() {
             )}
 
             <button
+              type="button"
               onClick={createPlayer}
               disabled={!file || !playerName.trim() || isLoading}
               className={`font-bold px-6 py-3 rounded-full transition-all duration-300 ${
@@ -195,6 +308,7 @@ export default function PlayerLoginPage() {
               {isLoading ? (
                 <>
                   <svg
+                    aria-hidden="true"
                     className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
