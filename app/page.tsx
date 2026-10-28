@@ -15,6 +15,12 @@ export default function Home() {
       >
         🎮 Démarrer une Nouvelle Partie
       </Link>
+      <Link
+        href="/gages"
+        className="mt-6 inline-block underline underline-offset-4 font-semibold hover:text-yellow-300 transition-colors"
+      >
+        🖨️ Imprimer des gages
+      </Link>
     </div>
   );
 }
