@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { FLYPRINT_URL } from "@/lib/flyprint";
 
-const FLYPRINT_URL =
-  process.env.NEXT_PUBLIC_FLYPRINT_URL || "https://print.flybooth.app";
 const MAX_GAGES = 100;
 
 export default function PrintGagesPage() {

@@ -1,4 +1,21 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { isPrinterAvailable } from "@/lib/flyprint";
+
+async function PrintGagesLink() {
+  if (!(await isPrinterAvailable())) {
+    return null;
+  }
+
+  return (
+    <Link
+      href="/gages"
+      className="mt-6 inline-block underline underline-offset-4 font-semibold hover:text-yellow-300 transition-colors"
+    >
+      🖨️ Imprimer des gages
+    </Link>
+  );
+}
 
 export default function Home() {
   return (
@@ -15,12 +32,10 @@ export default function Home() {
       >
         🎮 Démarrer une Nouvelle Partie
       </Link>
-      <Link
-        href="/gages"
-        className="mt-6 inline-block underline underline-offset-4 font-semibold hover:text-yellow-300 transition-colors"
-      >
-        🖨️ Imprimer des gages
-      </Link>
+      {/* Only offer printing when the Flyprint printer answers. */}
+      <Suspense fallback={null}>
+        <PrintGagesLink />
+      </Suspense>
     </div>
   );
 }
